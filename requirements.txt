@@ -1,0 +1,8 @@
+arxiv
+duckduckgo-search
+faiss-cpu
+langchain
+langchain-openai
+langgraph
+pymupdf
+python-dotenv
