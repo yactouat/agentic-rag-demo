@@ -5,8 +5,8 @@ from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import ToolExecutor
 
 tool_belt = [
-    DuckDuckGoSearchRun(),
-    ArxivQueryRun()
+    ArxivQueryRun(),
+    DuckDuckGoSearchRun()
 ]
 tool_executor = ToolExecutor(tool_belt)
 functions = [convert_to_openai_function(t) for t in tool_belt]
