@@ -67,5 +67,4 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           script: |
               cd ~/agentic-rag-demo
-              chmod +x start-app.sh
-              nohup ./start-app.sh &>/dev/null &
+              nohup streamlit run streamlit_app.py &>/dev/null &
