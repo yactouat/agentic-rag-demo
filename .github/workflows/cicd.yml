@@ -47,7 +47,7 @@ jobs:
               cp .env.example .env
               > .env
               echo "DUMMY_ENV_VAR=${DUMMY_VAR}" >> .env
-    - name: run-app
+    - name: stop-start-app
       uses: appleboy/ssh-action@v1.0.3
       with:
           host: ${{ secrets.SSH_HOST }}
@@ -56,5 +56,9 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           script_stop: true
           script: |
+              # find Streamlit process PID
+              pid=$(ps aux | grep streamlit | awk '{print $2}')
+              # kill the process
+              kill -9 $pid
               cd ~/agentic-rag-demo
-              python3 -m streamlit run streamlit_app.py
+              nohup python3 -m streamlit run streamlit_app.py &
