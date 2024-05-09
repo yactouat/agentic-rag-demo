@@ -20,3 +20,6 @@ if [ ! -z "$pids" ]; then
 else
     echo "No matching processes found."
 fi
+
+# start the app
+nohup streamlit run streamlit_app.py &>/dev/null &
