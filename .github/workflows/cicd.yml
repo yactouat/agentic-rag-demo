@@ -47,7 +47,7 @@ jobs:
               cp .env.example .env
               > .env
               echo "DUMMY_ENV_VAR=${DUMMY_VAR}" >> .env
-    - name: stop-start-app
+    - name: stop-app
       uses: appleboy/ssh-action@v1.0.3
       with:
           host: ${{ secrets.SSH_HOST }}
@@ -58,5 +58,14 @@ jobs:
               cd ~/agentic-rag-demo
               chmod +x stop-app.sh
               ./stop-app.sh
+    - name: start-app
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+          host: ${{ secrets.SSH_HOST }}
+          key: ${{ secrets.SSH_PRIV_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          script: |
+              cd ~/agentic-rag-demo
               chmod +x start-app.sh
-              nohup ./start-app.sh &>/dev/null &
+              ./start-app.sh
