@@ -36,15 +36,18 @@ if openai_api_key is None:
         st.experimental_rerun()
 
 st.title('🔗 meta RAG 🔗')
-st.write('this is a demo app of me playing around with RAG')
+st.subheader("answer questions about RAG")
+st.write('this is my first shot at both Streamlit and at RAG apps!')
+st.write('you can help me improve by providing feedback at https://github.com/yactouat/agentic-rag-demo/discussions')
 
 with st.form('rag_form'):
     query = st.text_area('Ask me anything about RAG')
     submitted = st.form_submit_button('RAG me up!')
 
-    if submitted and not validate_openai_api_key(os.environ["OPENAI_API_KEY"]):
+    if submitted and not validate_openai_api_key(os.environ.get("OPENAI_API_KEY")):
         st.warning('Please enter your OpenAI API key!', icon='⚠')
     elif submitted:
         formatted_inputs = {"messages": [HumanMessage(content=query)]}
         res = generate_graph_agent_response(formatted_inputs)
-        st.info(res["messages"][-1].content)
+        output = res["messages"][-1].content if not isinstance(res["messages"][-1], str) else res["messages"][-1]
+        st.info(output)
