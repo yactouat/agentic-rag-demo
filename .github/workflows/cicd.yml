@@ -58,3 +58,5 @@ jobs:
               cd ~/agentic-rag-demo
               chmod +x stop-app.sh
               ./stop-app.sh
+              chmod +x start-app.sh
+              ./start-app.sh
