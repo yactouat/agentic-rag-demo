@@ -56,3 +56,4 @@ server {
 - `sudo nginx -t`
 - `sudo systemctl reload nginx`
 - at this point, you should be able to see the dummy content when you navigate to your domain or subdomain
+- after having deployed the code, run `nohup streamlit run streamlit_app.py &>/dev/null` on the server to launch the app in the background (the CI stops the current app)
