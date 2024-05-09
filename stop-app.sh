@@ -1,14 +1,8 @@
 #!/bin/bash
 
-# Get the PID of the streamlit process
-pid=$(ps aux | grep streamlit_app.py | awk '{print $2}')
-
-# Check if the PID exists
-if ps -p $pid > /dev/null
-then
-  echo "Streamlit process with PID $pid exists. Killing the process..."
-  kill -9 $pid
-  echo "Streamlit process killed successfully."
-else
-  echo "Streamlit process with PID $pid does not exist. Not doing anything..."
+# check if we have more at least two `python3 -m streamlit run streamlit_app.py` processes running
+# shellcheck disable=SC2046
+if [ $(ps aux | grep 'python3 -m streamlit run streamlit_app.py' | wc -l) -gt 1 ]; then
+    # kill all `python3 -m streamlit run streamlit_app.py` processes
+    pkill -f 'python3 -m streamlit run streamlit_app.py'
 fi
