@@ -54,7 +54,6 @@ jobs:
           key: ${{ secrets.SSH_PRIV_KEY }}
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
-          script_stop: true
           script: |
               cd ~/agentic-rag-demo
               chmod +x stop-app.sh
