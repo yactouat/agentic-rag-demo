@@ -17,13 +17,13 @@ For the OpenAI API key, if it's not loaded from a `.env` file, the user will be 
 
 ## run locally
 
-To run the application locally: `streamlit run main.py` OR `python3 -m streamlit run main.py`.
+To run the application locally: `streamlit run streamlit_app.py` OR `python3 -m streamlit run streamlit_app.py`.
 
 ## run on an Ubuntu server
 
 Deployment is done using GitHub Actions, you need to fill in a few repository secrets, as stated in the `.github/workflows/cicd.yml` file.
 
-Before you push to the main branch and deploy the app, make sure you have followed these steps:
+Before you push to the master branch and deploy the app, make sure you have followed these steps:
 
 - `mkdir ~/agentic-rag-demo`
 - `sudo apt update && sudo apt upgrade -y`
