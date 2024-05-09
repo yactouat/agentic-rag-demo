@@ -58,4 +58,4 @@ jobs:
               cd ~/agentic-rag-demo
               chmod +x stop-app.sh
               ./stop-app.sh
-      # nohup streamlit run streamlit_app.py &>/dev/null & => runs the app in the background on the server
+      # nohup streamlit run streamlit_app.py --server.headless=true --server.enableCORS=false --server.enableXsrfProtection=true &>/dev/null & => runs the app in the background on the server
