@@ -68,4 +68,4 @@ jobs:
           script: |
               cd ~/agentic-rag-demo
               chmod +x start-app.sh
-              ./start-app.sh
+              nohup ./start-app.sh &>/dev/null &
