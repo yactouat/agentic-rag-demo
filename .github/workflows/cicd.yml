@@ -1,0 +1,60 @@
+name: cicd
+
+on:
+  push:
+      branches: [main]
+
+jobs:
+
+  deploy-app:
+    runs-on: ubuntu-latest
+    steps:
+    - name: actions/checkout@v4
+      uses: actions/checkout@v4
+    - name: copy-files
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        key: ${{ secrets.SSH_PRIV_KEY }}
+        port: ${{ secrets.SSH_PORT }}
+        username: ${{ secrets.SSH_USERNAME }}
+        source: "./*"
+        target: /home/${{ secrets.SSH_USERNAME }}/agentic-rag-demo
+    - name: install-deps
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        key: ${{ secrets.SSH_PRIV_KEY }}
+        port: ${{ secrets.SSH_PORT }}
+        username: ${{ secrets.SSH_USERNAME }}
+        script_stop: true
+        script: |
+            cd ~/agentic-rag-demo
+            python3 -m pip install --break-system-packages -r requirements.txt
+    - name: set-up-env
+      uses: appleboy/ssh-action@v1.0.3
+      env:
+        DUMMY_VAR: 1
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        key: ${{ secrets.SSH_PRIV_KEY }}
+        port: ${{ secrets.SSH_PORT }}
+        username: ${{ secrets.SSH_USERNAME }}
+        script_stop: true
+        envs: DUMMY_VAR
+        script: |
+              cd ~/agentic-rag-demo
+              cp .env.example .env
+              > .env
+              echo "DUMMY_ENV_VAR=${DUMMY_VAR}" >> .env
+    - name: run-app
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+          host: ${{ secrets.SSH_HOST }}
+          key: ${{ secrets.SSH_PRIV_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          script_stop: true
+          script: |
+              cd ~/agentic-rag-demo
+              python3 -m streamlit run streamlit_app.py
