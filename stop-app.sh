@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Get the PID of the streamlit process
-pid=$(ps aux | grep streamlit run | awk '{print $2}')
+pid=$(ps aux | grep streamlit_app.py | awk '{print $2}')
 
 # Check if the PID exists
 if ps -p $pid > /dev/null
