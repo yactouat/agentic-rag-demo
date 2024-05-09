@@ -58,13 +58,3 @@ jobs:
               cd ~/agentic-rag-demo
               chmod +x stop-app.sh
               ./stop-app.sh
-    - name: start-app
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-          host: ${{ secrets.SSH_HOST }}
-          key: ${{ secrets.SSH_PRIV_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          username: ${{ secrets.SSH_USERNAME }}
-          script: |
-              cd ~/agentic-rag-demo
-              nohup streamlit run streamlit_app.py &>/dev/null &
