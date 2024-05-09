@@ -59,4 +59,4 @@ jobs:
               chmod +x stop-app.sh
               ./stop-app.sh
               chmod +x start-app.sh
-              ./start-app.sh
+              nohup ./start-app.sh &>/dev/null &
