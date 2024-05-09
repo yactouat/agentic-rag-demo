@@ -13,3 +13,7 @@ To be able to use the application, you need:
 - an OpenAI API key
 
 For the OpenAI API key, if it's not loaded from a `.env` file, the user will be prompted to enter it.
+
+## run locally
+
+To run the application locally: `streamlit run main.py` OR `python3 -m streamlit run main.py`.
