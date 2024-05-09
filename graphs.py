@@ -8,14 +8,14 @@ from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolInvocation
 from langchain.prompts import PromptTemplate
 
-from chains import rag_chain
+from chains import get_rag_chain
 from state import AgentState
-from tools import model_with_tools, tool_executor
+from tools import get_function_calling_model, get_tool_executor
 
 
 def call_model(state: AgentState):
     messages = state["messages"]
-    response = model_with_tools.invoke(messages)
+    response = get_function_calling_model().invoke(messages)
     # because we've annotated the messages with `operator.add`,
     # the response will be appended to the messages (our state object)
     return {"messages": [response]}
@@ -23,7 +23,7 @@ def call_model(state: AgentState):
 
 def call_initial_rag_chain(state: AgentState):
     q = {"question": state["messages"][-1].content}
-    res = rag_chain.invoke(q)
+    res = get_rag_chain().invoke(q)
     return {"messages": [res["response"]]}
 
 
@@ -37,7 +37,7 @@ def call_tool(state: AgentState):
         )
     )
 
-    response = tool_executor.invoke(action)
+    response = get_tool_executor().invoke(action)
 
     function_message = FunctionMessage(content=str(response), name=action.tool)
 
@@ -91,6 +91,40 @@ You will respond with exactly either 'yes' or 'no'.""",
     return "continue"
 
 
+def get_graph_app():
+    # let's start building our graph
+    workflow = StateGraph(AgentState)
+
+    # the initial RAG fetch checks if in the current data, we have something that answers the user's question
+    workflow.add_node("initial_rag_call", call_initial_rag_chain)
+    workflow.add_node("agent", call_model)
+    workflow.add_node("tool", call_tool)
+    # final edge to end the conversation
+    workflow.add_edge("tool", "agent")
+    # check if the question is fully answered on initial interaction
+    workflow.add_conditional_edges(
+        "initial_rag_call",
+        fully_answers_question,
+        {
+            "continue": "agent",
+            "end": END
+        }
+    )
+    # decide to call an external tool or output an answer with a conditional edge
+    workflow.add_conditional_edges(
+        "agent",
+        should_continue,
+        {
+            "continue": "tool",
+            "end": END
+        }
+    )
+    workflow.set_entry_point("initial_rag_call")
+
+    graph_app = workflow.compile()
+    return graph_app
+
+
 # this basically says that if we don't need to call a tool, we should end the conversation and output the response
 def should_continue(state):
     last_message = state["messages"][-1]
@@ -99,35 +133,3 @@ def should_continue(state):
         return "end"
 
     return "continue"
-
-
-# let's start building our graph
-workflow = StateGraph(AgentState)
-
-# the initial RAG fetch checks if in the current data, we have something that answers the user's question
-workflow.add_node("initial_rag_call", call_initial_rag_chain)
-workflow.add_node("agent", call_model)
-workflow.add_node("tool", call_tool)
-# final edge to end the conversation
-workflow.add_edge("tool", "agent")
-# check if the question is fully answered on initial interaction
-workflow.add_conditional_edges(
-    "initial_rag_call",
-    fully_answers_question,
-    {
-        "continue": "agent",
-        "end": END
-    }
-)
-# decide to call an external tool or output an answer with a conditional edge
-workflow.add_conditional_edges(
-    "agent",
-    should_continue,
-    {
-        "continue": "tool",
-        "end": END
-    }
-)
-workflow.set_entry_point("initial_rag_call")
-
-graph_app = workflow.compile()
