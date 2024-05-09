@@ -59,4 +59,4 @@ jobs:
               cd ~/agentic-rag-demo
               chmod +x stop-app.sh
               ./stop-app.sh
-              nohup python3 -m streamlit run streamlit_app.py >/dev/null 2>&1 &
+              nohup python3 -m streamlit run streamlit_app.py &>/dev/null &
