@@ -8,7 +8,8 @@ import streamlit as st
 
 
 # using our graph agent
-def generate_graph_agent_response(inputs):
+def generate_graph_agent_response(inputs, openai_api_key: str | None = None):
+    os.environ["OPENAI_API_KEY"] = openai_api_key
     response = get_graph_app().invoke(inputs)
     return response
 
@@ -31,7 +32,6 @@ if openai_api_key is None:
     st.sidebar.write('Please enter your OpenAI API key to use this app')
     openai_api_key = st.sidebar.text_input('API Key')
     if st.sidebar.button('Save'):
-        os.environ["OPENAI_API_KEY"] = openai_api_key
         st.session_state.sidebar_state = "collapsed"
         st.experimental_rerun()
 
@@ -44,10 +44,11 @@ with st.form('rag_form'):
     query = st.text_area('Ask me anything about RAG')
     submitted = st.form_submit_button('RAG me up!')
 
-    if submitted and not validate_openai_api_key(os.environ.get("OPENAI_API_KEY")):
+    if submitted and not validate_openai_api_key(openai_api_key):
         st.warning('Please enter your OpenAI API key!', icon='⚠')
     elif submitted:
         formatted_inputs = {"messages": [HumanMessage(content=query)]}
-        res = generate_graph_agent_response(formatted_inputs)
+        res = generate_graph_agent_response(formatted_inputs, openai_api_key)
+        os.environ["OPENAI_API_KEY"] = ''
         output = res["messages"][-1].content if not isinstance(res["messages"][-1], str) else res["messages"][-1]
         st.info(output)
