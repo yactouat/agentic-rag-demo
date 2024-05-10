@@ -49,6 +49,5 @@ with st.form('rag_form'):
     elif submitted:
         formatted_inputs = {"messages": [HumanMessage(content=query)]}
         res = generate_graph_agent_response(formatted_inputs, openai_api_key)
-        os.environ["OPENAI_API_KEY"] = ''
         output = res["messages"][-1].content if not isinstance(res["messages"][-1], str) else res["messages"][-1]
         st.info(output)
