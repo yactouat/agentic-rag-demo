@@ -108,7 +108,5 @@ systemctl --user start agentic-rag.service
 systemctl --user status agentic-rag.service
 ```
 
-... here we are giving read and write permissions to our regular user on the service file, and read permissions to everyone else
-
 - to stop the service => `systemctl --user stop agentic-rag.service`
 - we are now ready to let the CI/CD pipeline do its magic 🚀
