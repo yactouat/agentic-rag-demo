@@ -1,4 +1,3 @@
-# disable usage stats
 [browser]
 gatherUsageStats = false
 serverPort = 8501
