@@ -78,7 +78,8 @@ server {
   - start the app on boot
   - release the terminal when we start the app from our CI/CD pipeline
   - provide us with an easy way of stopping the app in the same CI/CD pipeline before updating it
-- `sudo nano /etc/systemd/system/agentic-rag.service`
+- `mkdir -p ~/.config/systemd/user`
+- `nano ~/.config/systemd/user/agentic-rag.service`
 - write the following content:
 
 ```
@@ -89,16 +90,25 @@ After=network.target
 [Service]
 Type=simple
 ExecStart=/usr/bin/python3 -m streamlit run /home/<remote-user>/agentic-rag-demo/agentic_rag.py
-ExecStop=/usr/bin/sh /home/<remote-user>/agentic-rag-demo/stop-app.sh
-User=<remote-user>
-Group=<remote-user-group>
+Restart=on-failure
+RestartSec=2
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 ```
 
-... don't forget to replace the placeholders with the appropriate values. You can get the name of your user's group with `id`.
+... don't forget to replace the placeholders with the appropriate values.
 
-- `sudo systemctl daemon-reload`
-- `sudo systemctl enable agentic-rag`
-- you can also test stopping and starting the service with `sudo systemctl stop agentic-rag` and `sudo systemctl start agentic-rag`, and `sudo systemctl status agentic-rag` (to check if the service status)
+- now we need our service to be stoppable/start-able from our CI/CD pipeline with our regular user, so let's do =>
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now agentic-rag.service
+systemctl --user start agentic-rag.service
+systemctl --user status agentic-rag.service
+```
+
+... here we are giving read and write permissions to our regular user on the service file, and read permissions to everyone else
+
+- to stop the service => `systemctl --user stop agentic-rag.service`
+- we are now ready to let the CI/CD pipeline do its magic 🚀
