@@ -9,7 +9,6 @@ import streamlit as st
 
 # using our graph agent
 def generate_graph_agent_response(inputs, openai_api_key: str | None = None):
-    os.environ["OPENAI_API_KEY"] = openai_api_key
     response = get_graph_app().invoke(inputs)
     return response
 
@@ -22,18 +21,6 @@ def validate_openai_api_key(api_key: str | None) -> bool:
 
 load_dotenv()
 openai_api_key = os.environ.get("OPENAI_API_KEY")
-
-if 'sidebar_state' not in st.session_state:
-    st.session_state.sidebar_state = "auto" if openai_api_key is None else "collapsed"
-st.set_page_config(initial_sidebar_state=st.session_state.sidebar_state)
-
-if openai_api_key is None:
-    st.sidebar.title('🔑 OpenAI API Key 🔑')
-    st.sidebar.write('Please enter your OpenAI API key to use this app')
-    openai_api_key = st.sidebar.text_input('API Key')
-    if st.sidebar.button('Save'):
-        st.session_state.sidebar_state = "collapsed"
-        st.experimental_rerun()
 
 st.title('🔗 meta RAG 🔗')
 st.subheader("answer questions about RAG")

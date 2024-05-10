@@ -2,7 +2,7 @@
 
 Building up on [this excellent video from AI Makerspace](https://www.youtube.com/watch?v=SEA3eJrDc-k), this project implements a RAG system that queries data about... RAG systems.
 
-It uses a Streamlit UI to interact with the RAG system. The app is accessible on https://rag.yactouat.com.
+It uses a Streamlit UI to interact with the RAG system. The app is accessible on https://rag.yactouat.com. Contact me @ yacine.touati.pro@gmail.com to access the app.
 
 The LLMs under the hood are a mixture of ChatGPT 4 and 3.5.
 
@@ -35,9 +35,11 @@ These are actions you need to do on the remote server before you can run pipelin
 
 - back to your remote server from there on: `sudo apt update && sudo apt upgrade -y`
 - `sudo apt install nginx`
+- `sudo apt install apache2-utils`
 - `sudo mkdir -p /var/www/<domain>` (replace `<domain>` with your domain or subdomain)
 - `sudo chown -R www-data:www-data /var/www/<domain>`
 - `sudo chmod -R 755 /var/www/<domain>`
+- `sudo htpasswd -c /etc/nginx/.htpasswd demo` (`demo` is the username, you will be prompted to enter a password)
 - `sudo nano /etc/nginx/sites-available/<domain>.conf`
 - add the following content:
 
@@ -52,6 +54,9 @@ server {
     server_name <domain>;
 
     location / {
+        auth_basic "demo app request password @ yacine.touati.pro@gmail.com";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+    
         proxy_pass http://0.0.0.0:8501;
         proxy_http_version 1.1;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

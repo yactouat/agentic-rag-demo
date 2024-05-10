@@ -34,20 +34,20 @@ jobs:
     - name: deploy-app
       uses: appleboy/ssh-action@v1.0.3
       env:
-        DUMMY_VAR: 1
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       with:
         host: ${{ secrets.SSH_HOST }}
         key: ${{ secrets.SSH_PRIV_KEY }}
         port: ${{ secrets.SSH_PORT }}
         username: ${{ secrets.SSH_USERNAME }}
         script_stop: true
-        envs: DUMMY_VAR
+        envs: OPENAI_API_KEY
         script: |
               cd ~/agentic-rag-demo
               python3 -m pip install --break-system-packages -r requirements.txt
               cp .env.example .env
               > .env
               # putting dummy env var in .env file just to show how to export env vars from secrets in this pipeline
-              echo "DUMMY_ENV_VAR=${DUMMY_VAR}" >> .env
+              echo "OPENAI_API_KEY=${OPENAI_API_KEY}" >> .env
               mv .streamlit/config.remote.toml .streamlit/config.toml
               systemctl --user start agentic-rag.service
