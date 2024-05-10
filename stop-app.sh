@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# find the PID of the processes having 'streamlit_app.py' in their name
+# find the PID of the processes having 'agentic_rag.py' in their name
 # we use 'pgrep' with '-f' to match against the full process command line
 
-pids=$(pgrep -f "streamlit_app.py")
+pids=$(pgrep -f "agentic_rag.py")
 
 # check if any PID was found
 if [ ! -z "$pids" ]; then

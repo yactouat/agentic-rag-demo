@@ -11,6 +11,7 @@ jobs:
     steps:
     - name: actions/checkout@v4
       uses: actions/checkout@v4
+    # TODO stop app
     - name: copy-files
       uses: appleboy/scp-action@v0.1.7
       with:
@@ -47,15 +48,4 @@ jobs:
               cp .env.example .env
               > .env
               echo "DUMMY_ENV_VAR=${DUMMY_VAR}" >> .env
-    - name: stop-app
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-          host: ${{ secrets.SSH_HOST }}
-          key: ${{ secrets.SSH_PRIV_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          username: ${{ secrets.SSH_USERNAME }}
-          script: |
-              cd ~/agentic-rag-demo
-              chmod +x stop-app.sh
-              ./stop-app.sh
-      # nohup streamlit run streamlit_app.py --server.headless=true --server.enableCORS=false --server.enableXsrfProtection=true &>/dev/null & => runs the app in the background on the server
+      # TODO start app

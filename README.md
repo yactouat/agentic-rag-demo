@@ -17,47 +17,29 @@ For the OpenAI API key, if it's not loaded from a `.env` file, the user will be 
 
 ## run locally
 
-To run the application locally: `streamlit run streamlit_app.py` OR `python3 -m streamlit run streamlit_app.py`.
+To run the application locally: `streamlit run agentic_rag.py` OR `python3 -m streamlit run agentic_rag.py`.
 
 ## run on an Ubuntu server
 
-Deployment is done using GitHub Actions, you need to fill in a few repository secrets, as stated in the `.github/workflows/cicd.yml` file.
+Deployment is done using GitHub Actions on push to the `master` branch, you need to fill in a few repository secrets, as stated in the `.github/workflows/cicd.yml` file.
 
-Before you push to the master branch and deploy the app, make sure you have followed these steps:
+### installation steps before letting the CI/CD pipeline run its course
+
+These are actions you need to do on the remote server before you can run pipelines (I've run them on an Ubuntu 24 server)
 
 - `mkdir ~/agentic-rag-demo`
-- `sudo apt update && sudo apt upgrade -y`
+- clone this very repo on your machine in order to be able to copy it to the server
+- from your local machine => 
+
+`scp -r <repo> <user>@<remote-server-ip>:/home/<remote-user>/agentic-rag-demo` (replace `<repo>`, `<user>`, `<remote-server-ip>`, and `<remote-user>` with the appropriate values
+
+- back to your remote server from there on: `sudo apt update && sudo apt upgrade -y`
 - `sudo apt install nginx`
-- configure an A record in your DNS settings to point to your server's IP address for your domain or subdomain
 - `sudo mkdir -p /var/www/<domain>` (replace `<domain>` with your domain or subdomain)
 - `sudo chown -R www-data:www-data /var/www/<domain>`
 - `sudo chmod -R 755 /var/www/<domain>`
-- `sudo touch /var/www/<domain>/index.html` and add some dummy content in it
 - `sudo nano /etc/nginx/sites-available/<domain>.conf`
 - add the following content:
-
-```
-server {
-    listen 80;
-    listen [::]:80;
-
-    root /var/www/<domain>;
-    index index.html;
-
-    server_name <domain>;
-
-    location / {
-        try_files $uri $uri/ =404;
-    }
-}
-```
-
-- `sudo ln -s /etc/nginx/sites-available/<domain>.conf /etc/nginx/sites-enabled/`
-- `sudo nginx -t`
-- `sudo systemctl reload nginx`
-- at this point, you should be able to see the dummy content when you navigate to your domain or subdomain on plain HTTP
-- after having deployed the code, run `nohup streamlit run streamlit_app.py --server.headless=true --server.enableCORS=false --server.enableXsrfProtection=true &>/dev/null &` on the server to launch the app in the background (the CI stops the current app)
-- you can now update your Nginx conf like so, to serve the app:
 
 ```
 server {
@@ -82,7 +64,41 @@ server {
 }
 ```
 
+- `sudo ln -s /etc/nginx/sites-available/<domain>.conf /etc/nginx/sites-enabled/`
 - `sudo nginx -t`
 - `sudo systemctl reload nginx`
-- you should now be able to see the app on your domain or subdomain on plain HTTP
-- now follow the instructions on certbot website to put the app behind HTTPS
+- configure an A record in your DNS settings to point to your server's IP address for your domain or subdomain
+- `cd ~/agentic-rag-demo`
+- `pip install -r requirements.txt`
+- `streamlit run agentic_rag.py`
+- at this point, you should be able to see the dummy content when you navigate to your domain or subdomain on plain HTTP (after DNS propagation)
+- now follow the instructions on certbot website to put the app behind HTTPS, you should now have a working RAG system accessible on your domain or subdomain 😎
+- now we want to create a service for the app to run in the background, this helps us:
+  - manage crashes
+  - start the app on boot
+  - release the terminal when we start the app from our CI/CD pipeline
+  - provide us with an easy way of stopping the app in the same CI/CD pipeline before updating it
+- `sudo nano /etc/systemd/system/agentic-rag.service`
+- write the following content:
+
+```
+[Unit]
+Description=a service for the agentic rag demo
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 -m streamlit run /home/<remote-user>/agentic-rag-demo/agentic_rag.py
+ExecStop=/usr/bin/sh /home/<remote-user>/agentic-rag-demo/stop-app.sh
+User=<remote-user>
+Group=<remote-user-group>
+
+[Install]
+WantedBy=multi-user.target
+```
+
+... don't forget to replace the placeholders with the appropriate values. You can get the name of your user's group with `id`.
+
+- `sudo systemctl daemon-reload`
+- `sudo systemctl enable agentic-rag`
+- you can also test stopping and starting the service with `sudo systemctl stop agentic-rag` and `sudo systemctl start agentic-rag`, and `sudo systemctl status agentic-rag` (to check if the service status)
