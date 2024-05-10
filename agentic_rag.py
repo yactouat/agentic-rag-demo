@@ -8,7 +8,7 @@ import streamlit as st
 
 
 # using our graph agent
-def generate_graph_agent_response(inputs, openai_api_key: str | None = None):
+def generate_graph_agent_response(inputs):
     response = get_graph_app().invoke(inputs)
     return response
 
@@ -35,6 +35,6 @@ with st.form('rag_form'):
         st.warning('Please enter your OpenAI API key!', icon='⚠')
     elif submitted:
         formatted_inputs = {"messages": [HumanMessage(content=query)]}
-        res = generate_graph_agent_response(formatted_inputs, openai_api_key)
+        res = generate_graph_agent_response(formatted_inputs)
         output = res["messages"][-1].content if not isinstance(res["messages"][-1], str) else res["messages"][-1]
         st.info(output)
