@@ -13,8 +13,6 @@ To be able to use the application, you need:
 - a working Python environment (I use 3.12)
 - an OpenAI API key
 
-For the OpenAI API key, if it's not loaded from a `.env` file, the user will be prompted to enter it.
-
 ## run locally
 
 To run the application locally: `streamlit run agentic_rag.py` OR `python3 -m streamlit run agentic_rag.py`.
